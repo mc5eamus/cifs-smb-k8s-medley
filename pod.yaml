@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cifsbox-service
+  namespace: default
+spec:
+  type: LoadBalancer
+  ports:  
+  - name: p455 
+    port: 445
+    targetPort: 445
+    protocol: TCP
+  - name: p139
+    port: 139
+    targetPort: 139    
+    protocol: TCP
+  selector:
+    app: cifsbox
+---
+apiVersion: v1
+kind: Pod
+metadata:
+ name: cifsbox
+ labels:
+   app: cifsbox
+spec:
+  containers:
+   - name: cifsbox
+     image: mgrkubicleacr.azurecr.io/cifsbox
+     command:
+       - /app/start.sh
+     securityContext:
+       allowPrivilegeEscalation: true
+       privileged: true
+       capabilities:
+         add:
+           - SYS_ADMIN
+           - DAC_READ_SEARCH
+  tolerations:
+  - key: "kubernetes.azure.com/scalesetpriority"
+    operator: "Equal"
+    value: "spot"
+    effect: "NoSchedule"
+  affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: "kubernetes.azure.com/scalesetpriority"
+              operator: In
+              values:
+              - "spot"  
+
+

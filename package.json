@@ -1,0 +1,9 @@
+{
+    "name": "filemonitor",
+    "version": "0.0.1",
+    "description": "file monitor",
+    "license": "MIT",
+    "dependencies": {
+        "chokidar": "^3.5.3"
+    }
+}
